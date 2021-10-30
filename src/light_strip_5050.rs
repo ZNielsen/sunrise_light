@@ -50,6 +50,7 @@ impl LightStrip5050 {
 }
 impl LedStrip for LightStrip5050 {
     fn set_brightness(&mut self, brightness: u16) {
+        self.brightness = brightness;
     }
 
     fn set_color(&mut self, color: PresetColor) {
@@ -64,6 +65,9 @@ impl LedStrip for LightStrip5050 {
     }
 
     fn set_rgb(&mut self, red_val: u8, green_val: u8, blue_val: u8) {
+        self.multi_led_info.get_mut(&LedPin::Red).unwrap().ratio   = red_val   as f32 / 255.0;
+        self.multi_led_info.get_mut(&LedPin::Green).unwrap().ratio = green_val as f32 / 255.0;
+        self.multi_led_info.get_mut(&LedPin::Blue).unwrap().ratio  = blue_val  as f32 / 255.0;
     }
 }
 
@@ -99,3 +103,9 @@ impl LightStrip5050Manager {
         });
     }
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Tests
+///////////////////////////////////////////////////////////////////////////////
+
