@@ -1,7 +1,5 @@
 // Copyright © Zach Nielsen 2021
 
-// TODO - add readme explaining that this is supposed to hook into Shortcuts
-
 mod light_strip_5050;
 use crate::light_strip_5050::LightStrip5050Manager;
 

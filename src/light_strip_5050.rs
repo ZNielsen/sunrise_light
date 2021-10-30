@@ -82,11 +82,12 @@ impl LightStrip5050Manager {
         let thread_lights = Arc::clone(&self.lights);
         let mut counter: u16 = 0;
         thread::spawn(move || loop {
+            let top = std::time::Instant::now();
             thread::sleep(std::time::Duration::from_millis(PWM_UPDATE as u64));
             let mut lights = thread_lights.lock().unwrap();
 
-            // TODO - increment based on actual time elapsed, rather than nominal time waited
-            counter = (counter + PWM_UPDATE) % PWM_PERIOD;
+            let sleep_time = std::time::Instant::now().checked_duration_since(top).unwrap().as_millis();
+            counter = (counter + sleep_time as u16) % PWM_PERIOD;
 
             for color in vec![LedPin::Red, LedPin::Green, LedPin::Blue].into_iter(){
                 if counter <= lights.multi_led_info[&color].ratio as u16 * lights.brightness {
