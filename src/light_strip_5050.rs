@@ -24,8 +24,6 @@ enum LedPin {
 }
 
 // PWM Config - 100ms period, update every 1ms
-const PWM_PERIOD: u16 = 100;
-const PWM_UPDATE: u16 = 1;
 struct PinPwmPair {
     pin: gpio::sysfs::SysFsGpioOutput,
     pub ratio: f32,
@@ -36,6 +34,9 @@ pub struct LightStrip5050 {
     brightness: u16,
 }
 impl LightStrip5050 {
+    const PWM_PERIOD: u16 = 100;
+    const PWM_UPDATE: u16 = 1;
+
     pub fn new() -> LightStrip5050 {
         let mut default_map = HashMap::new();
         default_map.insert(LedPin::Red,   PinPwmPair{ pin: gpio::sysfs::SysFsGpioOutput::open(RED_PIN).unwrap(),   ratio: 1.0 });
@@ -83,11 +84,11 @@ impl LightStrip5050Manager {
         let mut counter: u16 = 0;
         thread::spawn(move || loop {
             let top = std::time::Instant::now();
-            thread::sleep(std::time::Duration::from_millis(PWM_UPDATE as u64));
+            thread::sleep(std::time::Duration::from_millis(LightStrip5050::PWM_UPDATE as u64));
             let mut lights = thread_lights.lock().unwrap();
 
             let sleep_time = std::time::Instant::now().checked_duration_since(top).unwrap().as_millis();
-            counter = (counter + sleep_time as u16) % PWM_PERIOD;
+            counter = (counter + sleep_time as u16) % LightStrip5050::PWM_PERIOD;
 
             for color in vec![LedPin::Red, LedPin::Green, LedPin::Blue].into_iter(){
                 if counter <= lights.multi_led_info[&color].ratio as u16 * lights.brightness {
